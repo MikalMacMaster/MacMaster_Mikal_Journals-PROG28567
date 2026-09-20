@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     public float bombTrailSpacing = 0.5f;
     public int numberOfTrailBombs = 5;
+
     
     void Start()
     {
@@ -30,6 +31,11 @@ public class Player : MonoBehaviour
         if (Keyboard.current.cKey.wasPressedThisFrame)
 
         SpawnBombOnRandomCorner(3f);
+
+        if (Keyboard.current.wKey.wasPressedThisFrame)
+
+        WarpPlayer(enemyTransform, 0.5f);
+
 
     }
 
@@ -94,5 +100,12 @@ public class Player : MonoBehaviour
         Vector3 spawnPosition = transform.position + direction * inDistance;
 
         Instantiate(bombPrefab, spawnPosition, Quaternion.identity);
+    }
+
+    public void WarpPlayer(Transform target, float ratio)
+    {
+        ratio = Mathf.Clamp01(ratio);
+
+        transform.position = Vector3.Lerp(transform.position, target.position, ratio);
     }
 }
