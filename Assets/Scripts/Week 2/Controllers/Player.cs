@@ -36,7 +36,11 @@ public class Player : MonoBehaviour
 
         WarpPlayer(enemyTransform, 0.5f);
 
-
+        if (Keyboard.current.rKey.wasPressedThisFrame) 
+        {
+            Debug.Log("R pressed");
+            DetectAsteroids(5f, asteroidTransforms);
+        }
     }
 
     IEnumerator SpawnBombAtOffset (Vector3 inOffset)
@@ -107,5 +111,22 @@ public class Player : MonoBehaviour
         ratio = Mathf.Clamp01(ratio);
 
         transform.position = Vector3.Lerp(transform.position, target.position, ratio);
+    }
+
+    public void DetectAsteroids(float inMaxRange, List<Transform> inAsteroids)
+    {
+        foreach (Transform asteroid in inAsteroids)
+        {
+            float distance = Vector3.Distance(transform.position, asteroid.position);
+
+            if (distance <= inMaxRange)
+            {
+                Vector3 direction = (asteroid.position - transform.position).normalized;
+
+                Vector3 endPosition = transform.position + direction * 2.5f;
+
+                Debug.DrawLine(transform.position, endPosition, Color.green, 2f);
+            }
+        }
     }
 }
