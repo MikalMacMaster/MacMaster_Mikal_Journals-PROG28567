@@ -26,7 +26,11 @@ public class Player : MonoBehaviour
         if (Keyboard.current.tKey.wasPressedThisFrame)
     
         SpawnBombTrail(bombTrailSpacing, numberOfTrailBombs);
-    
+
+        if (Keyboard.current.cKey.wasPressedThisFrame)
+
+        SpawnBombOnRandomCorner(3f);
+
     }
 
     IEnumerator SpawnBombAtOffset (Vector3 inOffset)
@@ -60,5 +64,35 @@ public class Player : MonoBehaviour
 
             Instantiate(bombPrefab, transform.position + offset, Quaternion.identity);
         }
+    }
+
+    public void SpawnBombOnRandomCorner(float inDistance)
+    {
+        int randomCorner = Random.Range(0, 4);
+
+        Vector3 direction;
+
+        if (randomCorner == 0)
+        {
+            direction = transform.up + transform.right;
+        }
+        else if (randomCorner == 1)
+        {
+            direction = transform.up - transform.right;
+        }
+        else if (randomCorner == 2)
+        {
+            direction = -transform.up + transform.right;
+        }
+        else
+        {
+            direction = -transform.up - transform.right;
+        }
+
+        direction = direction.normalized;
+
+        Vector3 spawnPosition = transform.position + direction * inDistance;
+
+        Instantiate(bombPrefab, spawnPosition, Quaternion.identity);
     }
 }
