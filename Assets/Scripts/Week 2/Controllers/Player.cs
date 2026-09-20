@@ -8,6 +8,9 @@ public class Player : MonoBehaviour
     public Transform enemyTransform;
     public GameObject bombPrefab;
     public List<Transform> asteroidTransforms;
+
+    public float bombTrailSpacing = 0.5f;
+    public int numberOfTrailBombs = 5;
     
     void Start()
     {
@@ -19,6 +22,11 @@ public class Player : MonoBehaviour
     {
         if (Keyboard.current.bKey.wasPressedThisFrame)
            StartCoroutine(SpawnBombAtOffset(Vector3.up));
+
+        if (Keyboard.current.tKey.wasPressedThisFrame)
+    
+        SpawnBombTrail(bombTrailSpacing, numberOfTrailBombs);
+    
     }
 
     IEnumerator SpawnBombAtOffset (Vector3 inOffset)
@@ -43,4 +51,14 @@ public class Player : MonoBehaviour
 
     //    Instantiate(bombPrefab, SpawnPosition, Quaternion.identity);
     //}
+
+    public void SpawnBombTrail(float inBombSpacing, int inNumberOfBombs)
+    {
+        for (int i = 1; i <= inNumberOfBombs; i++)
+        {
+            Vector3 offset = -transform.up * inBombSpacing * i;
+
+            Instantiate(bombPrefab, transform.position + offset, Quaternion.identity);
+        }
+    }
 }
