@@ -12,6 +12,11 @@ public class Player : MonoBehaviour
     public float bombTrailSpacing = 0.5f;
     public int numberOfTrailBombs = 5;
 
+    public float moveSpeed = 1f;
+    public float maxSpeed = 5f;
+    public float accelerationTime = 2f;
+
+    private Vector3 velocity;
     
     void Start()
     {
@@ -21,6 +26,8 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
+        PlayerMovement();
+
         if (Keyboard.current.bKey.wasPressedThisFrame)
            StartCoroutine(SpawnBombAtOffset(Vector3.up));
 
@@ -41,7 +48,45 @@ public class Player : MonoBehaviour
             Debug.Log("R pressed");
             DetectAsteroids(5f, asteroidTransforms);
         }
+
     }
+
+    private void PlayerMovement()
+    {
+        Vector3 input = Vector3.zero;
+
+        if (Keyboard.current.leftArrowKey.isPressed)
+        {
+            input += Vector3.left;
+        }
+
+        if (Keyboard.current.rightArrowKey.isPressed)
+        {
+            input += Vector3.right;
+        }
+
+        if (Keyboard.current.upArrowKey.isPressed)
+        {
+            input += Vector3.up;
+        }
+
+        if (Keyboard.current.downArrowKey.isPressed)
+        {
+            input += Vector3.down;
+        }
+
+        if (input != Vector3.zero)
+        {
+            float acceleration = maxSpeed / accelerationTime;
+
+            velocity += input.normalized * acceleration * Time.deltaTime;
+
+            velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
+        }
+
+        transform.position += velocity * Time.deltaTime;
+    }
+
 
     IEnumerator SpawnBombAtOffset (Vector3 inOffset)
     {
