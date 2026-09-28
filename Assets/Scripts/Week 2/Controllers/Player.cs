@@ -75,13 +75,19 @@ public class Player : MonoBehaviour
             input += Vector3.down;
         }
 
+        float acceleration = maxSpeed / accelerationTime;
         if (input != Vector3.zero)
         {
-            float acceleration = maxSpeed / accelerationTime;
-
             velocity += input.normalized * acceleration * Time.deltaTime;
 
             velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
+        }
+        else
+        {
+            if(velocity != Vector3.zero)
+            {
+                velocity -= velocity.normalized * acceleration * Time.deltaTime;
+            }
         }
 
         transform.position += velocity * Time.deltaTime;
