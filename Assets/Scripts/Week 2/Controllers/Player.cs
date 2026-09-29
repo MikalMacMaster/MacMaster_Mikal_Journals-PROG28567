@@ -16,6 +16,9 @@ public class Player : MonoBehaviour
     public float maxSpeed = 5f;
     public float accelerationTime = 2f;
 
+    public float radarRadius = 3f;
+    public int radarSideCount = 8;
+
     private Vector3 velocity;
     
     void Start()
@@ -26,6 +29,7 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
+        DrawRadar(radarRadius, radarSideCount);
         PlayerMovement();
 
         if (Keyboard.current.bKey.wasPressedThisFrame)
@@ -177,6 +181,42 @@ public class Player : MonoBehaviour
                 Vector3 endPosition = transform.position + direction * 2.5f;
 
                 Debug.DrawLine(transform.position, endPosition, Color.green, 2f);
+            }
+        }
+    }
+
+    private void DrawRadar(float radius, int numberOfSides)
+    {
+        float stepAngle = 360.0f / numberOfSides;
+        List<Vector3> points = new();
+
+        stepAngle *= Mathf.Deg2Rad;
+        float currentAngle = stepAngle;
+
+        for (int i = 0; i < numberOfSides; i++)
+        {
+            float xPos = Mathf.Cos(currentAngle) * radius;
+            float yPos = Mathf.Sin(currentAngle) * radius;
+
+            Vector3 newPoint = new Vector2(xPos, yPos);
+            points.Add(newPoint);
+
+            currentAngle += stepAngle;
+        }
+
+        for (int i = 0;i < numberOfSides - 1; i++)
+        {
+            Vector3 startPoint = transform.position + points[i];
+            Vector3 endPoint = transform.position + points[i + 1];
+
+            Debug.DrawLine(startPoint, endPoint, Color.green);
+
+            if (i == numberOfSides - 2)
+            {
+                startPoint = transform.position + points[i + 1];
+                endPoint = transform.position + points[0];
+
+                Debug.DrawLine(startPoint, endPoint, Color.green);
             }
         }
     }
