@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     public Transform enemyTransform;
     public GameObject bombPrefab;
+    public GameObject powerupPrefab;
     public List<Transform> asteroidTransforms;
 
     public float bombTrailSpacing = 0.5f;
@@ -19,6 +20,9 @@ public class Player : MonoBehaviour
     public float radarRadius = 3f;
     public int radarSideCount = 8;
 
+    public float powerupRadius = 2f;
+    public int powerupCount = 5;
+
     private Vector3 velocity;
     
     void Start()
@@ -29,7 +33,7 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
-        DrawRadar(radarRadius, radarSideCount);
+        EnemyRadar(radarRadius, radarSideCount);
         PlayerMovement();
 
         if (Keyboard.current.bKey.wasPressedThisFrame)
@@ -52,6 +56,9 @@ public class Player : MonoBehaviour
             Debug.Log("R pressed");
             DetectAsteroids(5f, asteroidTransforms);
         }
+
+        if (Keyboard.current.pKey.wasPressedThisFrame)
+            SpawnPowerups(powerupRadius, powerupCount);
 
     }
 
@@ -185,39 +192,43 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void DrawRadar(float radius, int numberOfSides)
+    public void EnemyRadar(float radius, int circlePoints)
     {
-        float stepAngle = 360.0f / numberOfSides;
-        List<Vector3> points = new();
+        // I pick the colour first by checking the enemy's distance
+        float distance = Vector3.Distance(transform.position, enemyTransform.position);
+        Color circleColour = Color.green;
 
-        stepAngle *= Mathf.Deg2Rad;
-        float currentAngle = stepAngle;
-
-        for (int i = 0; i < numberOfSides; i++)
+        if (distance <= radius)
         {
-            float xPos = Mathf.Cos(currentAngle) * radius;
-            float yPos = Mathf.Sin(currentAngle) * radius;
-
-            Vector3 newPoint = new Vector2(xPos, yPos);
-            points.Add(newPoint);
-
-            currentAngle += stepAngle;
+            circleColour = Color.red;
         }
 
-        for (int i = 0;i < numberOfSides - 1; i++)
+        float stepAngle = 360f / circlePoints * Mathf.Deg2Rad;
+
+        for (int i = 0; i < circlePoints; i++)
         {
-            Vector3 startPoint = transform.position + points[i];
-            Vector3 endPoint = transform.position + points[i + 1];
+            float startAngle = stepAngle * i;
+            float endAngle = stepAngle * (i + 1);
 
-            Debug.DrawLine(startPoint, endPoint, Color.green);
+            Vector3 startPoint = transform.position + new Vector3(Mathf.Cos(startAngle), Mathf.Sin(startAngle), 0f) * radius;
+            Vector3 endPoint = transform.position + new Vector3(Mathf.Cos(endAngle), Mathf.Sin(endAngle), 0f) * radius;
 
-            if (i == numberOfSides - 2)
-            {
-                startPoint = transform.position + points[i + 1];
-                endPoint = transform.position + points[0];
+            Debug.DrawLine(startPoint, endPoint, circleColour);
+        }
+    }
 
-                Debug.DrawLine(startPoint, endPoint, Color.green);
-            }
+    public void SpawnPowerups(float radius, int numberOfPowerups)
+    {
+        // I split 360 degrees evenly so every powerup is the same angle apart
+        float stepAngle = 360f / numberOfPowerups * Mathf.Deg2Rad;
+
+        for (int i = 0; i < numberOfPowerups; i++)
+        {
+            float angle = stepAngle * i;
+
+            Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * radius;
+
+            Instantiate(powerupPrefab, transform.position + offset, Quaternion.identity);
         }
     }
 }
